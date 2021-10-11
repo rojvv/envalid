@@ -15,10 +15,6 @@ export const strictProxyMiddleware = <T extends object>(
     // For usage with TypeScript esModuleInterop flag
     "__esModule",
   ];
-  const inspectSymbolStrings = [
-    "Symbol(util.inspect.custom)",
-    "Symbol(nodejs.util.inspect.custom)",
-  ];
 
   return new Proxy(envObj, {
     get(target, name: string) {
@@ -26,10 +22,7 @@ export const strictProxyMiddleware = <T extends object>(
       // proxy that throws crashes the entire process. This permits access on
       // the necessary properties for `console.log(envObj)`, `envObj.length`,
       // `envObj.hasOwnProperty('string')` to work.
-      if (
-        inspectables.includes(name) ||
-        inspectSymbolStrings.includes(name.toString())
-      ) {
+      if (inspectables.includes(name)) {
         // @ts-expect-error TS doesn't like symbol types as indexers
         return target[name];
       }
