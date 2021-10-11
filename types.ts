@@ -8,11 +8,6 @@ export interface Spec<T> {
    */
   default?: T;
   /**
-   * A fallback value to use only when DENO_ENV is not 'production'.
-   * This is handy for env vars that are required for production environments, but optional for development and testing.
-   */
-  devDefault?: T;
-  /**
    * A string that describes the env var.
    */
   desc?: string;
@@ -28,19 +23,6 @@ export interface Spec<T> {
 
 export interface ValidatorSpec<T> extends Spec<T> {
   _parse: (input: string) => T;
-}
-
-export interface CleanedEnvAccessors {
-  /** true if DENO_ENV === 'development' */
-  readonly isDevelopment: boolean;
-  readonly isDev: boolean;
-
-  /** true if DENO_ENV === 'test' */
-  readonly isTest: boolean;
-
-  /** true if DENO_ENV === 'production' */
-  readonly isProduction: boolean;
-  readonly isProd: boolean;
 }
 
 export interface ReporterOptions<T> {

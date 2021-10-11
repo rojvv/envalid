@@ -1,8 +1,6 @@
-import { CleanedEnvAccessors } from "./types.ts";
-
 export const strictProxyMiddleware = <T extends object>(
   envObj: T,
-  rawEnv: unknown,
+  rawEnv: unknown
 ) => {
   const inspectables = [
     "length",
@@ -11,13 +9,6 @@ export const strictProxyMiddleware = <T extends object>(
     "toJSON", // Allow JSON.stringify() on output. See #157
     Symbol.toStringTag,
     Symbol.iterator,
-
-    // For jest
-    "asymmetricMatch",
-    "nodeType",
-
-    // For react-refresh, see #150
-    "$$typeof",
 
     // For libs that use `then` checks to see if objects are Promises (see #74):
     "then",
@@ -47,7 +38,7 @@ export const strictProxyMiddleware = <T extends object>(
       if (!varExists) {
         if (typeof rawEnv === "object" && rawEnv?.hasOwnProperty?.(name)) {
           throw new ReferenceError(
-            `[envalid] Env var ${name} was accessed but not validated. This var is set in the environment; please add an envalid validator for it.`,
+            `[envalid] Env var ${name} was accessed but not validated. This var is set in the environment; please add an envalid validator for it.`
           );
         }
 
@@ -59,36 +50,19 @@ export const strictProxyMiddleware = <T extends object>(
 
     set(_target, name: string) {
       throw new TypeError(
-        `[envalid] Attempt to mutate environment value: ${name}`,
+        `[envalid] Attempt to mutate environment value: ${name}`
       );
     },
   });
 };
 
-export const accessorMiddleware = <T>(envObj: T, rawEnv: unknown) => {
-  // Attach is{Prod/Dev/Test} properties for more readable DENO_ENV checks
-  // Note that isDev and isProd are just aliases to isDevelopment and isProduction
-
-  // @ts-ignore attempt to read DENO_ENV even if it's not in the spec
-  const computedDenoEnv = envObj.DENO_ENV || rawEnv.DENO_ENV;
-
-  // If DENO_ENV is not set, assume production
-  const isProd = !computedDenoEnv || computedDenoEnv === "production";
-
-  Object.defineProperties(envObj, {
-    isDevelopment: { value: computedDenoEnv === "development" },
-    isDev: { value: computedDenoEnv === "development" },
-    isProduction: { value: isProd },
-    isProd: { value: isProd },
-    isTest: { value: computedDenoEnv === "test" },
-  });
-  return envObj as T & CleanedEnvAccessors;
-};
-
-export const applyDefaultMiddleware = <T>(cleanedEnv: T, rawEnv: unknown) => {
+export const applyDefaultMiddleware = <T extends object>(
+  cleanedEnv: T,
+  rawEnv: unknown
+) => {
   // Note: Ideally we would declare the default middlewares in an array and apply them in series with
   // a generic pipe() function. However, a generically typed variadic pipe() appears to not be possible
   // in TypeScript as of 4.x, so we just manually apply them below. See
   // https://github.com/microsoft/TypeScript/pull/39094#issuecomment-647042984
-  return strictProxyMiddleware(accessorMiddleware(cleanedEnv, rawEnv), rawEnv);
+  return strictProxyMiddleware(cleanedEnv, rawEnv);
 };

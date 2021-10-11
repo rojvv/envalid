@@ -1,5 +1,5 @@
-import { CleanedEnvAccessors, CleanOptions, ValidatorSpec } from "./types.ts";
-import { getSanitizedEnv, testOnlySymbol } from "./core.ts";
+import { CleanOptions, ValidatorSpec } from "./types.ts";
+import { getSanitizedEnv } from "./core.ts";
 import { applyDefaultMiddleware } from "./middleware.ts";
 
 /**
@@ -13,10 +13,12 @@ import { applyDefaultMiddleware } from "./middleware.ts";
 export function cleanEnv<T>(
   environment: unknown,
   specs: { [K in keyof T]: ValidatorSpec<T[K]> },
-  options: CleanOptions<T> = {},
-): Readonly<T & CleanedEnvAccessors> {
+  options: CleanOptions<T> = {}
+): Readonly<T> {
   const cleaned = getSanitizedEnv(environment, specs, options);
-  return Object.freeze(applyDefaultMiddleware(cleaned, environment));
+  return Object.freeze(
+    applyDefaultMiddleware(cleaned, environment)
+  ) as Readonly<T>;
 }
 
 /**
@@ -29,23 +31,12 @@ export function cleanEnv<T>(
  * @param applyMiddleware A function that applies transformations to the cleaned env object
  * @param options An object that specifies options for cleanEnv.
  */
-export function customCleanEnv<T, MW>(
+export function customCleanEnv<T extends object, MW>(
   environment: unknown,
   specs: { [K in keyof T]: ValidatorSpec<T[K]> },
   applyMiddleware: (cleaned: T, rawEnv: unknown) => MW,
-  options: CleanOptions<T> = {},
+  options: CleanOptions<T> = {}
 ): Readonly<MW> {
   const cleaned = getSanitizedEnv(environment, specs, options);
   return Object.freeze(applyMiddleware(cleaned, environment));
 }
-
-/**
- * Utility function for providing default values only when DENO_ENV=test
- *
- * For more context, see https://github.com/af/envalid/issues/32
- */
-export const testOnly = <T>(defaultValueForTests: T) => {
-  return Deno.env.get("DENO_ENV") === "test"
-    ? defaultValueForTests
-    : (testOnlySymbol as unknown as T); // T is not strictly correct, but prevents type errors during usage
-};
