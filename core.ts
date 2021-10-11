@@ -74,8 +74,7 @@ export function getSanitizedEnv<T extends object>(
           throw new EnvMissingError(formatSpecDescription(spec));
         }
 
-        // @ts-ignore (fixes af/envalid#138) Need to figure out why explicitly undefined default breaks inference
-        cleanedEnv[k] = undefined;
+        cleanedEnv[k] = undefined!;
       } else {
         cleanedEnv[k] = validateVar({ name: k as string, spec, rawValue });
       }
