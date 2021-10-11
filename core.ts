@@ -2,8 +2,6 @@ import { EnvError, EnvMissingError } from "./errors.ts";
 import { CleanOptions, Spec, ValidatorSpec } from "./types.ts";
 import { defaultReporter } from "./reporter.ts";
 
-export const testOnlySymbol = Symbol("envalid - test only");
-
 /**
  * Validate a single env var, given a spec object
  *
@@ -48,9 +46,6 @@ const readRawEnvValue = <T>(env: unknown, k: keyof T): string | T[keyof T] => {
   return (env as any)[k];
 };
 
-const isTestOnlySymbol = (value: any): value is symbol =>
-  value === testOnlySymbol;
-
 /**
  * Perform the central validation/sanitization logic on the full environment object
  */
@@ -74,10 +69,6 @@ export function getSanitizedEnv<T extends object>(
       spec.hasOwnProperty("default") && spec.default === rawValue;
 
     try {
-      if (isTestOnlySymbol(rawValue)) {
-        throw new EnvMissingError(formatSpecDescription(spec));
-      }
-
       if (rawValue === undefined) {
         if (!usingFalsyDefault) {
           throw new EnvMissingError(formatSpecDescription(spec));
