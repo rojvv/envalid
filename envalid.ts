@@ -10,15 +10,16 @@ import { applyDefaultMiddleware } from "./middleware.ts";
  * @param specs An object that specifies the format of required vars.
  * @param options An object that specifies options for cleanEnv.
  */
-export function cleanEnv<T>(
+export function cleanEnv<T extends Record<never, never>>(
   environment: unknown,
   specs: { [K in keyof T]: ValidatorSpec<T[K]> },
-  options: CleanOptions<T> = {}
+  options: CleanOptions<T> = {},
 ): Readonly<T> {
   const cleaned = getSanitizedEnv(environment, specs, options);
   return Object.freeze(
-    applyDefaultMiddleware(cleaned, environment)
-  ) as Readonly<T>;
+    // TODO
+    Object.assign({}, applyDefaultMiddleware(cleaned, environment)),
+  );
 }
 
 /**
@@ -31,11 +32,11 @@ export function cleanEnv<T>(
  * @param applyMiddleware A function that applies transformations to the cleaned env object
  * @param options An object that specifies options for cleanEnv.
  */
-export function customCleanEnv<T extends object, MW>(
+export function customCleanEnv<T, MW>(
   environment: unknown,
   specs: { [K in keyof T]: ValidatorSpec<T[K]> },
   applyMiddleware: (cleaned: T, rawEnv: unknown) => MW,
-  options: CleanOptions<T> = {}
+  options: CleanOptions<T> = {},
 ): Readonly<MW> {
   const cleaned = getSanitizedEnv(environment, specs, options);
   return Object.freeze(applyMiddleware(cleaned, environment));

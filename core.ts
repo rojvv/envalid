@@ -2,6 +2,8 @@ import { EnvError, EnvMissingError } from "./errors.ts";
 import { CleanOptions, Spec, ValidatorSpec } from "./types.ts";
 import { defaultReporter } from "./reporter.ts";
 
+export const testOnlySymbol = Symbol("envalid - test only");
+
 /**
  * Validate a single env var, given a spec object
  *
@@ -15,12 +17,11 @@ function validateVar<T>({
 }: {
   name: string;
   rawValue: string | T;
-  spec: Spec<T> & { _parse: (input: string) => T };
+  spec: ValidatorSpec<T>;
 }) {
   if (typeof spec._parse !== "function") {
     throw new EnvError(`Invalid spec for "${name}"`);
   }
-
   const value = spec._parse(rawValue as string);
 
   if (spec.choices) {
@@ -30,7 +31,6 @@ function validateVar<T>({
       throw new EnvError(`Value "${value}" not in choices [${spec.choices}]`);
     }
   }
-
   if (value == null) throw new EnvError(`Invalid value for env var "${name}"`);
   return value;
 }
@@ -42,17 +42,23 @@ function formatSpecDescription<T>(spec: Spec<T>) {
   return `${spec.desc}${egText}${docsText}`;
 }
 
-const readRawEnvValue = <T>(env: unknown, k: keyof T): string | T[keyof T] => {
+const readRawEnvValue = <T>(
+  env: unknown,
+  k: keyof T | "NODE_ENV",
+): string | T[keyof T] => {
   return (env as any)[k];
 };
+
+const isTestOnlySymbol = (value: any): value is symbol =>
+  value === testOnlySymbol;
 
 /**
  * Perform the central validation/sanitization logic on the full environment object
  */
-export function getSanitizedEnv<T extends object>(
+export function getSanitizedEnv<T>(
   environment: unknown,
   specs: { [K in keyof T]: ValidatorSpec<T[K]> },
-  options: CleanOptions<T> = {}
+  options: CleanOptions<T> = {},
 ): T {
   let cleanedEnv = {} as T;
   const errors: Partial<Record<keyof T, Error>> = {};
@@ -60,27 +66,34 @@ export function getSanitizedEnv<T extends object>(
 
   for (const k of varKeys) {
     const spec = specs[k];
+    const rawValue = readRawEnvValue(environment, k);
 
-    const rawValue = readRawEnvValue(environment, k) ?? spec.default;
-
-    // Default values can be anything falsy (including an explicitly set undefined), without
-    // triggering validation errors:
-    const usingFalsyDefault =
-      spec.hasOwnProperty("default") && spec.default === rawValue;
+    // If no value was given and default/devDefault were provided, return the appropriate default
+    // value without passing it through validation
+    if (rawValue === undefined) {
+      // Use devDefault values only if NODE_ENV was explicitly set, and isn't 'production'
+      if (spec.hasOwnProperty("default")) {
+        // @ts-expect-error default values can break the rules slightly by being explicitly set to undefined
+        cleanedEnv[k] = spec.default;
+        continue;
+      }
+    }
 
     try {
-      if (rawValue === undefined) {
-        if (!usingFalsyDefault) {
-          throw new EnvMissingError(formatSpecDescription(spec));
-        }
+      if (isTestOnlySymbol(rawValue)) {
+        throw new EnvMissingError(formatSpecDescription(spec));
+      }
 
-        cleanedEnv[k] = undefined!;
+      if (rawValue === undefined) {
+        // @ts-ignore (fixes #138) Need to figure out why explicitly undefined default/devDefault breaks inference
+        cleanedEnv[k] = undefined;
+        throw new EnvMissingError(formatSpecDescription(spec));
       } else {
         cleanedEnv[k] = validateVar({ name: k as string, spec, rawValue });
       }
     } catch (err) {
       if (options?.reporter === null) throw err;
-      errors[k] = err;
+      if (err instanceof Error) errors[k] = err;
     }
   }
 

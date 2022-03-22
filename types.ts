@@ -1,3 +1,9 @@
+type DefaultType<T> = T extends string ? string
+  : T extends number ? number
+  : T extends boolean ? boolean
+  : T extends object ? object
+  : any;
+
 export interface Spec<T> {
   /**
    * An Array that lists the admissable parsed values for the env var.
@@ -6,7 +12,7 @@ export interface Spec<T> {
   /**
    * A fallback value, which will be used if the env var wasn't specified. Providing a default effectively makes the env var optional.
    */
-  default?: T;
+  default?: DefaultType<T>;
   /**
    * A string that describes the env var.
    */
@@ -23,6 +29,19 @@ export interface Spec<T> {
 
 export interface ValidatorSpec<T> extends Spec<T> {
   _parse: (input: string) => T;
+}
+
+export interface CleanedEnvAccessors {
+  /** true if NODE_ENV === 'development' */
+  readonly isDevelopment: boolean;
+  readonly isDev: boolean;
+
+  /** true if NODE_ENV === 'test' */
+  readonly isTest: boolean;
+
+  /** true if NODE_ENV === 'production' */
+  readonly isProduction: boolean;
+  readonly isProd: boolean;
 }
 
 export interface ReporterOptions<T> {

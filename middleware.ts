@@ -1,6 +1,6 @@
-export const strictProxyMiddleware = <T extends object>(
+export const strictProxyMiddleware = <T extends {}>(
   envObj: T,
-  rawEnv: unknown
+  rawEnv: unknown,
 ) => {
   const inspectables = [
     "length",
@@ -28,10 +28,11 @@ export const strictProxyMiddleware = <T extends object>(
       }
 
       const varExists = target.hasOwnProperty(name);
+
       if (!varExists) {
         if (typeof rawEnv === "object" && rawEnv?.hasOwnProperty?.(name)) {
           throw new ReferenceError(
-            `[envalid] Env var ${name} was accessed but not validated. This var is set in the environment; please add an envalid validator for it.`
+            `[envalid] Env var ${name} was accessed but not validated. This var is set in the environment; please add an envalid validator for it.`,
           );
         }
 
@@ -43,7 +44,7 @@ export const strictProxyMiddleware = <T extends object>(
 
     set(_target, name: string) {
       throw new TypeError(
-        `[envalid] Attempt to mutate environment value: ${name}`
+        `[envalid] Attempt to mutate environment value: ${name}`,
       );
     },
   });
@@ -51,7 +52,7 @@ export const strictProxyMiddleware = <T extends object>(
 
 export const applyDefaultMiddleware = <T extends object>(
   cleanedEnv: T,
-  rawEnv: unknown
+  rawEnv: unknown,
 ) => {
   // Note: Ideally we would declare the default middlewares in an array and apply them in series with
   // a generic pipe() function. However, a generically typed variadic pipe() appears to not be possible
