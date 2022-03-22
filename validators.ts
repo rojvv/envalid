@@ -109,7 +109,7 @@ export function url<T extends string = string>(spec?: Spec<T>) {
     try {
       new URL(x);
       return x as T;
-    } catch (e) {
+    } catch (_err) {
       throw new EnvError(`Invalid url: "${x}"`);
     }
   })(spec);
@@ -121,11 +121,12 @@ export function url<T extends string = string>(spec?: Spec<T>) {
 // cleanEnv({
 //   MY_VAR: json<{ foo: number }>({ default: { foo: 123 } }),
 // })
+// deno-lint-ignore no-explicit-any
 export function json<T = any>(spec?: Spec<T>) {
   return makeValidator<T>((x: string) => {
     try {
       return JSON.parse(x) as T;
-    } catch (e) {
+    } catch (_err) {
       throw new EnvError(`Invalid json: "${x}"`);
     }
   })(spec);

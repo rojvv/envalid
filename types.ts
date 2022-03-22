@@ -1,8 +1,9 @@
 type DefaultType<T> = T extends string ? string
   : T extends number ? number
   : T extends boolean ? boolean
-  : T extends object ? object
-  : any;
+  : T extends Record<string, unknown> ? Record<string, unknown>
+  : // deno-lint-ignore no-explicit-any
+  any;
 
 export interface Spec<T> {
   /**

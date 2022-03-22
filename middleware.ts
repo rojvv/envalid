@@ -1,4 +1,4 @@
-export const strictProxyMiddleware = <T extends {}>(
+export const strictProxyMiddleware = <T extends Record<never, never>>(
   envObj: T,
   rawEnv: unknown,
 ) => {
@@ -27,7 +27,7 @@ export const strictProxyMiddleware = <T extends {}>(
         return target[name];
       }
 
-      const varExists = target.hasOwnProperty(name);
+      const varExists = Object.prototype.hasOwnProperty.call(target, name);
 
       if (!varExists) {
         if (typeof rawEnv === "object" && rawEnv?.hasOwnProperty?.(name)) {
@@ -50,7 +50,7 @@ export const strictProxyMiddleware = <T extends {}>(
   });
 };
 
-export const applyDefaultMiddleware = <T extends object>(
+export const applyDefaultMiddleware = <T extends Record<string, unknown>>(
   cleanedEnv: T,
   rawEnv: unknown,
 ) => {

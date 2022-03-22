@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { EnvError, EnvMissingError } from "./errors.ts";
 import { CleanOptions, Spec, ValidatorSpec } from "./types.ts";
 import { defaultReporter } from "./reporter.ts";
@@ -60,6 +61,7 @@ export function getSanitizedEnv<T>(
   specs: { [K in keyof T]: ValidatorSpec<T[K]> },
   options: CleanOptions<T> = {},
 ): T {
+  // deno-lint-ignore prefer-const
   let cleanedEnv = {} as T;
   const errors: Partial<Record<keyof T, Error>> = {};
   const varKeys = Object.keys(specs) as Array<keyof T>;
@@ -72,7 +74,7 @@ export function getSanitizedEnv<T>(
     // value without passing it through validation
     if (rawValue === undefined) {
       // Use devDefault values only if NODE_ENV was explicitly set, and isn't 'production'
-      if (spec.hasOwnProperty("default")) {
+      if (Object.prototype.hasOwnProperty.call(spec, "default")) {
         // @ts-expect-error default values can break the rules slightly by being explicitly set to undefined
         cleanedEnv[k] = spec.default;
         continue;
