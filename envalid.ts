@@ -3,13 +3,13 @@ import { getSanitizedEnv } from "./core.ts";
 import { applyDefaultMiddleware } from "./middleware.ts";
 
 /**
- * Returns a sanitized, immutable environment object. _Only_ the env vars
- * specified in the `validators` parameter will be accessible on the returned
+ * Returns a sanitized, immutable environment object. _Only_ the variables
+ * specified in the `specs` parameter will be accessible on the returned
  * object.
  *
- * @param environment An object containing your env vars, e.g. Deno.env.toObject().
- * @param specs An object that specifies the format of required vars.
- * @param options An object that specifies options for cleanEnv.
+ * @param environment An object containing the variables, e.g. `Deno.env.toObject()`.
+ * @param specs The specification to enforce on the environment.
+ * @param options
  */
 export function cleanEnv<T extends Record<never, never>>(
   environment: unknown,
@@ -22,13 +22,12 @@ export function cleanEnv<T extends Record<never, never>>(
 
 /**
  * Returns a sanitized, immutable environment object, and passes it through a custom
- * applyMiddleware function before being frozen. Most users won't need the flexibility of custom
- * middleware; prefer cleanEnv() unless you're sure you need it
+ * `applyMiddleware` function. This won't be required in most use cases.
  *
- * @param environment An object containing your env vars, e.g. Deno.env.toObject()
- * @param specs An object that specifies the format of required vars.
- * @param applyMiddleware A function that applies transformations to the cleaned env object
- * @param options An object that specifies options for cleanEnv.
+ * @param environment An object containing the variables, e.g. `Deno.env.toObject()`.
+ * @param specs  The specification to enforce on the environment.
+ * @param applyMiddleware A function that applies transformations to the cleaned environment.
+ * @param options
  */
 export function customCleanEnv<T, MW>(
   environment: unknown,

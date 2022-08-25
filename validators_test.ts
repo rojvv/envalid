@@ -18,7 +18,7 @@ import { assertPassthrough } from "./utils.ts";
 
 const makeSilent = { reporter: null };
 
-Deno.test("bool() works with various formats", () => {
+Deno.test("bool()", () => {
   assertThrows(() => cleanEnv({ FOO: "asfd" }, { FOO: bool() }, makeSilent));
 
   const trueBool = cleanEnv({ FOO: true }, { FOO: bool() });
@@ -139,7 +139,7 @@ Deno.test("str()", () => {
   assertThrows(() => cleanEnv({ FOO: 42 }, { FOO: str() }, makeSilent));
 });
 
-Deno.test("custom types", () => {
+Deno.test("custom validators", () => {
   const alwaysFoo = makeValidator((_x) => "foo");
 
   const fooEnv = cleanEnv({ FOO: "asdf" }, { FOO: alwaysFoo() });

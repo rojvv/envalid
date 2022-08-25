@@ -34,7 +34,7 @@ export const makeValidator = <T>(parseFn: (input: string) => T) => {
 };
 
 // The reason for the function wrapper is to enable the <T extends boolean = boolean> type parameter
-// that enables better type inference. For more context, check out the following PR:
+// that enables better type inference. For more context, see
 // https://github.com/af/envalid/pull/118
 export function bool<T extends boolean = boolean>(spec?: Spec<T>) {
   return makeValidator((input: string | boolean) => {
@@ -115,12 +115,18 @@ export function url<T extends string = string>(spec?: Spec<T>) {
   })(spec);
 }
 
-// It's recommended that you provide an explicit type parameter for json validation
-// if you're using TypeScript. Otherwise the output will be typed as `any`. For example:
-//
-// cleanEnv({
-//   MY_VAR: json<{ foo: number }>({ default: { foo: 123 } }),
-// })
+/**
+ * It's recommended that you provide an explicit type parameter for json validation
+ * if you're using TypeScript:
+ *
+ * ```
+ * cleanEnv({
+ *   MY_VAR: json<{ foo: number }>({ default: { foo: 123 } }),
+ * })
+ * ```
+ *
+ * Otherwise, the output will be typed as `any`.
+ */
 // deno-lint-ignore no-explicit-any
 export function json<T = any>(spec?: Spec<T>) {
   return makeValidator<T>((x: string) => {

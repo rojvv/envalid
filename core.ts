@@ -6,10 +6,10 @@ import { defaultReporter } from "./reporter.ts";
 export const testOnlySymbol = Symbol("envalid - test only");
 
 /**
- * Validate a single env var, given a spec object
+ * Validate a single variable.
  *
- * @throws EnvError - If validation is unsuccessful
- * @return - The cleaned value
+ * @throws {EnvError} if unsuccessful
+ * @return The cleaned value
  */
 function validateVar<T>({
   spec,
@@ -36,7 +36,9 @@ function validateVar<T>({
   return value;
 }
 
-// Format a string error message for when a required env var is missing
+/**
+ * Returns the error message for a missing variable.
+ */
 function formatSpecDescription<T>(spec: Spec<T>) {
   const egText = spec.example ? ` (eg. "${spec.example}")` : "";
   const docsText = spec.docs ? `. See ${spec.docs}` : "";
@@ -54,15 +56,14 @@ const isTestOnlySymbol = (value: any): value is symbol =>
   value === testOnlySymbol;
 
 /**
- * Perform the central validation/sanitization logic on the full environment object
+ * Perform the central validation/sanitization on the environment object.
  */
 export function getSanitizedEnv<T>(
   environment: unknown,
   specs: { [K in keyof T]: ValidatorSpec<T[K]> },
   options: CleanOptions<T> = {},
 ): T {
-  // deno-lint-ignore prefer-const
-  let cleanedEnv = {} as T;
+  const cleanedEnv = {} as T;
   const errors: Partial<Record<keyof T, Error>> = {};
   const varKeys = Object.keys(specs) as Array<keyof T>;
 

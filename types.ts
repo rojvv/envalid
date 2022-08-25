@@ -7,23 +7,23 @@ type DefaultType<T> = T extends string ? string
 
 export interface Spec<T> {
   /**
-   * An Array that lists the admissable parsed values for the env var.
+   * An array of permitted values
    */
   choices?: ReadonlyArray<T>;
   /**
-   * A fallback value, which will be used if the env var wasn't specified. Providing a default effectively makes the env var optional.
+   * A fallback value to use if the variable was not set. Providing this effectively makes the variable optional.
    */
   default?: DefaultType<T>;
   /**
-   * A string that describes the env var.
+   * Description of the variable
    */
   desc?: string;
   /**
-   * An example value for the env var.
+   * Example value
    */
   example?: string;
   /**
-   * A url that leads to more detailed documentation about the env var.
+   * Documentation URL
    */
   docs?: string;
 }
@@ -39,8 +39,7 @@ export interface ReporterOptions<T> {
 
 export interface CleanOptions<T> {
   /**
-   * Pass in a function to override the default error handling and console output.
-   * See ./reporter.ts for the default implementation.
+   * A function that overrides the default reporter
    */
   reporter?: ((opts: ReporterOptions<T>) => void) | null;
 }
