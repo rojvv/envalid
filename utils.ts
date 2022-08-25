@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.130.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
 import { cleanEnv, ValidatorSpec } from "./mod.ts";
 
 // Ensure that a given environment spec passes through all values from the given
