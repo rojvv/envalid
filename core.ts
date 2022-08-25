@@ -45,7 +45,7 @@ function formatSpecDescription<T>(spec: Spec<T>) {
 
 const readRawEnvValue = <T>(
   env: unknown,
-  k: keyof T | "NODE_ENV",
+  k: keyof T,
 ): string | T[keyof T] => {
   return (env as any)[k];
 };
@@ -70,10 +70,9 @@ export function getSanitizedEnv<T>(
     const spec = specs[k];
     const rawValue = readRawEnvValue(environment, k);
 
-    // If no value was given and default/devDefault were provided, return the appropriate default
+    // If no value was given and default was provided, return the appropriate default
     // value without passing it through validation
     if (rawValue === undefined) {
-      // Use devDefault values only if NODE_ENV was explicitly set, and isn't 'production'
       if (Object.prototype.hasOwnProperty.call(spec, "default")) {
         // @ts-expect-error default values can break the rules slightly by being explicitly set to undefined
         cleanedEnv[k] = spec.default;
@@ -87,7 +86,7 @@ export function getSanitizedEnv<T>(
       }
 
       if (rawValue === undefined) {
-        // @ts-ignore (fixes #138) Need to figure out why explicitly undefined default/devDefault breaks inference
+        // @ts-ignore (fixes af/envalid#138) Need to figure out why explicitly undefined default breaks inference
         cleanedEnv[k] = undefined;
         throw new EnvMissingError(formatSpecDescription(spec));
       } else {

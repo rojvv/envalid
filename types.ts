@@ -32,19 +32,6 @@ export interface ValidatorSpec<T> extends Spec<T> {
   _parse: (input: string) => T;
 }
 
-export interface CleanedEnvAccessors {
-  /** true if NODE_ENV === 'development' */
-  readonly isDevelopment: boolean;
-  readonly isDev: boolean;
-
-  /** true if NODE_ENV === 'test' */
-  readonly isTest: boolean;
-
-  /** true if NODE_ENV === 'production' */
-  readonly isProduction: boolean;
-  readonly isProd: boolean;
-}
-
 export interface ReporterOptions<T> {
   errors: Partial<Record<keyof T, Error>>;
   env: unknown;
