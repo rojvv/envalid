@@ -3,14 +3,15 @@ export const strictProxyMiddleware = <T extends Record<never, never>>(
   rawEnv: unknown,
 ) => {
   const inspectables = [
+    "constructor",
     "length",
     "inspect",
     "hasOwnProperty",
-    "toJSON", // Allow JSON.stringify() on output. See #157
+    "toJSON", // Allow JSON.stringify() on output. See af/envalid#157
     Symbol.toStringTag,
     Symbol.iterator,
 
-    // For libs that use `then` checks to see if objects are Promises (see #74):
+    // For libs that use `then` checks to see if objects are Promises (see af/envalid#74):
     "then",
     // For usage with TypeScript esModuleInterop flag
     "__esModule",
@@ -21,7 +22,7 @@ export const strictProxyMiddleware = <T extends Record<never, never>>(
       // These checks are needed because calling console.log on a
       // proxy that throws crashes the entire process. This permits access on
       // the necessary properties for `console.log(envObj)`, `envObj.length`,
-      // `envObj.hasOwnProperty('string')` to work.
+      // `Object.prototype.hasOwnProperty.call(envObj, 'string')` to work.
       if (inspectables.includes(name)) {
         // @ts-expect-error TS doesn't like symbol types as indexers
         return target[name];
@@ -30,7 +31,10 @@ export const strictProxyMiddleware = <T extends Record<never, never>>(
       const varExists = Object.prototype.hasOwnProperty.call(target, name);
 
       if (!varExists) {
-        if (typeof rawEnv === "object" && rawEnv?.hasOwnProperty?.(name)) {
+        if (
+          typeof rawEnv === "object" && rawEnv &&
+          Object.prototype.hasOwnProperty.call(rawEnv, name)
+        ) {
           throw new ReferenceError(
             `[envalid] Env var ${name} was accessed but not validated. This var is set in the environment; please add an envalid validator for it.`,
           );
