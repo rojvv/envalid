@@ -3,7 +3,7 @@ import {
   blue,
   white,
   yellow,
-} from "https://deno.land/std@0.130.0/fmt/colors.ts";
+} from "https://deno.land/std@0.153.0/fmt/colors.ts";
 import { EnvMissingError } from "./errors.ts";
 import { ReporterOptions } from "./types.ts";
 
