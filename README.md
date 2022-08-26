@@ -19,8 +19,8 @@ const env = cleanEnv(Deno.env.toObject(), {
   SOMETHING: str({
     default: "default value",
     example: "some string",
-    desc: "short description",
-    docs: "huge documentation",
+    desc: "description",
+    docs: "https://example.com/configuration#SOMETHING",
   }),
   CHOICE: str({ choices: ["can be this", "or this"] }),
 });
