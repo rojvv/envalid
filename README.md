@@ -7,7 +7,7 @@ Validate environment variables.
 ```ts
 // You can also use it with dotenv:
 // import "https://deno.land/std/dotenv/load.ts";
-import { bool, cleanEnv, num, str } from "https://deno.land/envalid/mod.ts";
+import { bool, cleanEnv, num, str } from "https://deno.land/x/envalid/mod.ts";
 
 // You can also do
 // export default cleanEnv(
@@ -47,7 +47,7 @@ parameter which should be a function that returns either the cleaned value, or
 throws if the value is not acceptable.
 
 ```ts
-import { cleanEnv, makeValidator } from "https://deno.land/envalid/mod.ts";
+import { cleanEnv, makeValidator } from "https://deno.land/x/envalid/mod.ts";
 
 const twoUppercaseLetters = makeValidator((x) => {
   if (/^[A-Za-z]{2}$/.test(x)) {
