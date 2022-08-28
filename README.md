@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 the Deno authors. All rights reserved. MIT license. -->
+
 # envalid
 
 Validate environment variables.
@@ -69,7 +71,13 @@ will be displayed and the process exits with 1. You can override this behavior
 by using your own reporter:
 
 ```ts
-const env = cleanEnv(Deno.env.toObject(), myValidators, {
+import { cleanEnv } from "https://deno.land/x/envalid/mod.ts";
+
+const report = (error: string) => {
+  //
+};
+
+const env = cleanEnv(Deno.env.toObject(), {}, {
   reporter: ({ errors, env }) => {
     report("Invalid environment variables: " + Object.keys(errors));
   },
@@ -80,12 +88,18 @@ The error classes `EnvError` and `EnvMissingError` can also be used to examine
 the errors:
 
 ```ts
-const env = cleanEnv(Deno.env.toObject(), myValidators, {
+import {
+  cleanEnv,
+  EnvError,
+  EnvMissingError,
+} from "https://deno.land/x/envalid/mod.ts";
+
+const env = cleanEnv(Deno.env.toObject(), {}, {
   reporter: ({ errors, env }) => {
     for (const [envVar, err] of Object.entries(errors)) {
-      if (err instanceof envalid.EnvError) {
+      if (err instanceof EnvError) {
         //
-      } else if (err instanceof envalid.EnvMissingError) {
+      } else if (err instanceof EnvMissingError) {
         //
       } else {
         //
