@@ -25,8 +25,8 @@ Deno.test("default reporter", async (t) => {
         args: [
           "eval",
           `
-          import { defaultReporter } from "./envalid/reporter.ts";
-          import { EnvMissingError } from "./envalid/errors.ts";
+          import { defaultReporter } from "./reporter.ts";
+          import { EnvMissingError } from "./mod.ts";
           defaultReporter(
             {
               errors: { FOO: new EnvMissingError() },
@@ -55,8 +55,8 @@ Deno.test("default reporter", async (t) => {
         args: [
           "eval",
           `
-            import { defaultReporter } from "./envalid/reporter.ts";
-            import { EnvError } from "./envalid/errors.ts";
+            import { defaultReporter } from "./reporter.ts";
+            import { EnvError } from "./errors.ts";
             defaultReporter(
               {
                 errors: { FOO: new EnvError() },
@@ -85,8 +85,8 @@ Deno.test("default reporter", async (t) => {
         args: [
           "eval",
           `
-            import { defaultReporter } from "./envalid/reporter.ts";
-            import { EnvError } from "./envalid/errors.ts";
+            import { defaultReporter } from "./reporter.ts";
+            import { EnvError } from "./errors.ts";
             defaultReporter(
               {
                 errors: { FOO: new EnvError("custom msg") },
@@ -112,7 +112,7 @@ Deno.test("default reporter", async (t) => {
       args: [
         "eval",
         `
-          import { defaultReporter } from "./envalid/reporter.ts";
+          import { defaultReporter } from "./reporter.ts";
           defaultReporter(
             {
               errors: {},
