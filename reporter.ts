@@ -56,8 +56,6 @@ export const envalidErrorFormatter = <T = any>(
   }
 
   const output = [
-    RULE,
-    invalidVarsOutput.sort().join("\n"),
     missingVarsOutput.sort().join("\n"),
     RULE,
   ]
@@ -72,14 +70,13 @@ export const defaultReporter = <T = any>(
   { onError, logger }: ExtraOptions<T> = { logger: defaultLogger },
 ) => {
   if (!Object.keys(errors).length) return;
-
   envalidErrorFormatter(errors, logger);
 
   if (onError) {
     onError(errors);
   } else if (!Deno.noColor) {
     logger(yellow("\n Exiting with error code 1"));
-    Deno.exit(1);
+    if (!(Deno.env.get("DENO_DEPLOYMENT_ID") !== undefined)) Deno.exit(1);
   } else {
     throw new TypeError("Environment validation failed");
   }
