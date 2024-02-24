@@ -27,31 +27,35 @@ const RULE = white("================================");
 // This is exposed in the public API so third-party reporters can leverage this logic if desired
 export const envalidErrorFormatter = <T = any>(
   errors: Errors<T>,
-  logger: Logger = defaultLogger
+  logger: Logger = defaultLogger,
 ) => {
   const missingVarsOutput: string[] = [];
   const invalidVarsOutput: string[] = [];
   for (const [k, err] of Object.entries(errors)) {
     if (err instanceof EnvMissingError) {
-      missingVarsOutput.push(`    ${blue(k)}: ${err.message || "(required)"}`);
+      missingVarsOutput.push(
+        `    ${blue(k)}: ${err.message || "(required)"}`,
+      );
     } else {
       invalidVarsOutput.push(
-        `    ${blue(k)}: ${(err as Error)?.message || "(invalid format)"}`
+        `    ${blue(k)}: ${(err as Error)?.message || "(invalid format)"}`,
       );
     }
   }
 
   // Prepend "header" output for each section of the output:
   if (invalidVarsOutput.length) {
-    invalidVarsOutput.unshift(` ${yellow("Invalid")} environment variables:`);
+    invalidVarsOutput.unshift(
+      ` ${yellow("Invalid")} environment variables:`,
+    );
   }
   if (missingVarsOutput.length) {
-    missingVarsOutput.unshift(` ${yellow("Missing")} environment variables:`);
+    missingVarsOutput.unshift(
+      ` ${yellow("Missing")} environment variables:`,
+    );
   }
 
   const output = [
-    RULE,
-    invalidVarsOutput.sort().join("\n"),
     missingVarsOutput.sort().join("\n"),
     RULE,
   ]
@@ -63,10 +67,9 @@ export const envalidErrorFormatter = <T = any>(
 
 export const defaultReporter = <T = any>(
   { errors = {} }: ReporterOptions<T>,
-  { onError, logger }: ExtraOptions<T> = { logger: defaultLogger }
+  { onError, logger }: ExtraOptions<T> = { logger: defaultLogger },
 ) => {
   if (!Object.keys(errors).length) return;
-
   envalidErrorFormatter(errors, logger);
 
   if (onError) {
